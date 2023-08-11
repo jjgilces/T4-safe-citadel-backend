@@ -29,13 +29,18 @@ def verify_qr_code(db: Session, qr_id: str, user_id: uuid.UUID):
         return Response(status_code=status.HTTP_404_NOT_FOUND)
     resident = db.query(models.Resident).filter_by(id=visit.resident_id).first()
     visitor = db.query(models.Visitor).filter_by(id=visit.visitor_id).first()
-    residence = db.query(models.Residence).filter(
-        models.Residence.residents.any(id=visit.resident_id)
-    ).first()
-    return   { "resident": resident,
-                "visitor": visitor,
-                "visit": visit,
-                "residence": residence, }
+    residence = (
+        db.query(models.Residence)
+        .filter(models.Residence.residents.any(id=visit.resident_id))
+        .first()
+    )
+    return {
+        "resident": resident,
+        "visitor": visitor,
+        "visit": visit,
+        "residence": residence,
+    }
+
 
 def grouped_dict(it) -> dict:
     """
